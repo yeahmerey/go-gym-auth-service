@@ -1,10 +1,9 @@
-module auth-service
+module go-gym-auth-service
 
-go 1.21
+go 1.23.4
 
 require (
-	github.com/caarlos0/env/v6 v6.14.0
-	github.com/jmoiron/sqlx v1.4.1
+	github.com/caarlos0/env/v6 v6.10.1
 	github.com/joho/godotenv v1.5.1
-	github.com/lib/pq v1.10.9
+	github.com/mcuadros/go-defaults v1.2.0
 )

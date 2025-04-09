@@ -1,28 +1,28 @@
 package app
 
 import (
-	"context"
-	"auth-service/internal/app/config"
-	"auth-service/internal/app/connections"
-	"auth-service/internal/app/start"
-	"auth-service/pkg/logger"
+	"fmt"
+	"go-gym-auth-service/internal/app/config"
+	"net/http"
 )
 
-func Run(configFiles ...string) {
-	ctx := context.Background()
-
-	cfg, err := config.New(configFiles...)
+func Run(configFile string) error {
+	cfg, err := config.NewConfig(configFile)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("ошибка при загрузке конфигурации: %v", err)
 	}
 
-	logger.Init()
+	fmt.Printf("Запуск HTTP сервера на порту: %s\n", cfg.HTTPServer.Port)
 
-	conn, err := connections.New(cfg)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Auth service is running"))
+	})
+
+	err = http.ListenAndServe(":"+cfg.HTTPServer.Port, mux)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("ошибка при запуске HTTP сервера: %v", err)
 	}
-	defer conn.Close()
 
-	start.HTTP(ctx, cfg, conn)
+	return nil
 }
