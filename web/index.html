@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Service</title>
+</head>
+<body>
+    <h1>Welcome to Auth Service</h1>
+
+    <!-- Регистрация -->
+    <h2>Registration</h2>
+    <form id="registerForm">
+        <label for="email">Email:</label>
+        <input type="email" id="registerEmail" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="registerPassword" required>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+
+    <hr>
+
+    <!-- Логин -->
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label for="loginEmail">Email:</label>
+        <input type="email" id="loginEmail" required>
+        <br>
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
+    <p id="response"></p>
+
+    <script>
+        // Регистрация
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            fetch('http://localhost:8080/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = 'Registration successful!';
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Registration failed: ' + error.message;
+            });
+        });
+
+        // Логин
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            fetch('http://localhost:8080/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Login failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const token = data.token;
+                // Сохранение токена в localStorage
+                localStorage.setItem('authToken', token);
+                window.location.href = 'profile.html';  // Перенаправляем на страницу профиля
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = 'Login failed: ' + error.message;
+            });
+        });
+    </script>
+</body>
+</html>

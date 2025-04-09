@@ -1,18 +1,23 @@
 package main
 
 import (
-	"flag"
-	"go-gym-auth-service/internal/app"
-	"log"
+	"fmt"
+	"go-gym-auth-service/internal/app/auth"
+	"net/http"
 )
 
 func main() {
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Auth service is running"))
+	})
 
-	configFile := flag.String("config", "./internal/app/.env", "Path to config file")
-	flag.Parse()
+	http.HandleFunc("/register", auth.RegisterHandler)
+	http.HandleFunc("/login", auth.LoginHandler)
 
-	err := app.Run(*configFile)
-	if err != nil {
-		log.Fatalf("Ошибка при запуске приложения: %v", err)
-	}
+	http.Handle("/profile", auth.TokenAuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Profile page"))
+	})))
+
+	fmt.Println("Server is running on port 8080")
+	http.ListenAndServe(":8080", nil)
 }

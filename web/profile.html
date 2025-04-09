@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+<body>
+    <h1>Welcome to Your Profile</h1>
+    <p id="profileInfo"></p>
+    <button onclick="logout()">Logout</button>
+
+    <script>
+        // Проверка наличия токена
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = 'index.html';  // Перенаправляем на страницу логина, если нет токена
+        }
+
+        // Отправка запроса для получения информации о пользователе
+        fetch('http://localhost:8080/profile', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load profile');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('profileInfo').innerText = `Welcome, ${data.username}`;
+        })
+        .catch(error => {
+            document.getElementById('profileInfo').innerText = 'Error loading profile: ' + error.message;
+        });
+
+        // Функция для выхода из аккаунта
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = 'index.html';  // Перенаправляем на страницу логина
+        }
+    </script>
+</body>
+</html>
