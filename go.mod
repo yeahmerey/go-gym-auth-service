@@ -7,3 +7,5 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mcuadros/go-defaults v1.2.0
 )
+
+require golang.org/x/crypto v0.37.0 // indirect
